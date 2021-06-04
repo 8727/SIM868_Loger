@@ -1,5 +1,8 @@
 #include "sysInit.h"
 
+static __IO uint32_t msTicks;
+uint32_t upTime;
+
 //--------------------------------------------------------------------------------------------------------------------//
 #if defined ACTIVE_SWO
   struct __FILE { int handle; };
@@ -11,34 +14,29 @@
 #endif
 
 //--------------------------------------------------------------------------------------------------------------------//
+void SysTick_Handler(void){ msTicks++; }
+
+//--------------------------------------------------------------------------------------------------------------------//
+void DelayMs(uint32_t ms){ uint32_t tickStart = msTicks;
+  while((msTicks - tickStart) < ms){}
+}
+
+//--------------------------------------------------------------------------------------------------------------------//
 void Sysinit(void){
   _Bool status = 0x00;
   
-  #if defined DEBUG
-    printf("\n\r\t\tStart setting\n\r\n");
-  #endif
+  RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+  RCC->APB1ENR1 |= RCC_APB1ENR1_PWREN;
+  PWR->CR1 |= PWR_CR1_DBP;
 
+  
+  RCC->APB2ENR |= RCC_AHB2ENR_GPIOAEN;
+  RCC->APB2ENR |= RCC_AHB2ENR_GPIOBEN;
+  RCC->APB2ENR |= RCC_AHB2ENR_GPIOCEN;
+  RCC->APB2ENR |= RCC_AHB2ENR_GPIODEN;
+  RCC->APB2ENR |= RCC_AHB2ENR_GPIODEN;
+  
   status = SysTick_Config(SystemCoreClock / 1000);   //1ms
-  
-  RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-  RCC->APB1ENR |= RCC_APB1ENR_BKPEN;
-  RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-
-  AFIO->MAPR = AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
-  
-  RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-  RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
-  RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-  RCC->APB2ENR |= RCC_APB2ENR_IOPDEN;
-  
-  GPIOB->CRL &= ~GPIO_CRL_CNF5; //LED
-  GPIOB->CRL |= GPIO_CRL_MODE5;
-  LED_OFF;
-  
-  #if defined DEBUG
-  if(status){ printf("Sysinit........ERROR\r\n");
-  }else{ printf("Sysinit...........OK\r\n");}
-  #endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------//

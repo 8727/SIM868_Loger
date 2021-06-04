@@ -4,16 +4,19 @@
 //--------------------------------------------------------------------------------------------------------------------//
 #include "stm32l4xx.h"
 //#include "eeprom.h"
-//#include "string.h"
-//#include "setting.h"
+#include "string.h"
+#include "setting.h"
 
 
-//#include "FreeRTOS.h"
-//#include "task.h"
-//#include "queue.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 
 //--------------------------------------------------------------------------------------------------------------------//
-#if ( defined INFO || defined DEBUG )
+#define true                            0x01
+#define false                           0x00
+  
+#if (INFO == true || SIM868_DEBUG == true)
   #define ACTIVE_SWO
 #endif
 
@@ -24,11 +27,6 @@
   #define DEMCR                         (*((volatile unsigned long *)(0xE000EDFC)))
   #define TRCENA                        0x01000000
 #endif
-  
-#define true                            0x01
-#define false                           0x00
-#define LED_OFF                         GPIOB->BSRR = GPIO_BSRR_BS5
-#define LED_ON                          GPIOB->BSRR = GPIO_BSRR_BR5
 
 //--------------------------------------------------------------------------------------------------------------------//
 #define BUILD_YEAR (__DATE__[7] == '?' ? 1900 : (((__DATE__[7] - '0') * 1000 ) + (__DATE__[8] - '0') * 100 + (__DATE__[9] - '0') * 10 + __DATE__[10] - '0'))
@@ -44,5 +42,5 @@ extern uint32_t upTime;
 
 //--------------------------------------------------------------------------------------------------------------------//
 void Sysinit(void);
-
+void DelayMs(uint32_t ms);
 #endif /* SYSINIT_H */
